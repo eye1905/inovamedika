@@ -33,12 +33,12 @@ $acc_import = StringHelper::getAccess("import_permission");
 			</a>
 			@endif
 
-			@if($acc_import == 1)
+			{{-- @if($acc_import == 1)
 			<a href="#" onclick="goImport()" class="btn btn-sm btn-info">
 				<i class="fa fa-upload"> </i> 
 				Import Data {{ StringHelper::ucsplit($page_menu->name) }}
 			</a>
-			@endif
+			@endif --}}
 		@endif
 	</div>
 </div>
