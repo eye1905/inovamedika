@@ -144,7 +144,7 @@ class StaffController extends Controller
             $user->phone             = $staff->phone;
             $user->username             = $request->username;
             $user->password             = Hash::make($request->password);
-            $user->role_id             = $staff->role_id;
+            $user->role_id             = $request->role_id;
             $user->created_ip       = $request->ip();
             $user->status = $request->status?$request->status:"inactive";
             if(isset($request->gambar) and $request->file('gambar')!=null){
@@ -343,7 +343,7 @@ class StaffController extends Controller
                 'gambar'  => 'bail|nullable|image|mimes:jpg,png,jpeg,gif,svg|max:1024',
                 'status' => 'bail|required|in:active,inactive'
             ]);
-            
+
             if ($validator->fails())
             {
                 return redirect()->back()->with('errors', $validator->errors())->withInput($request->input());;

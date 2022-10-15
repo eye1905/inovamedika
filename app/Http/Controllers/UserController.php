@@ -13,7 +13,6 @@ use App\Models\Staff;
 use Hash;
 use App\Helpers\StringHelper;
 use Storage;
-use App\Models\RoleUser;
 use Validator;
 
 class UserController extends Controller
@@ -32,8 +31,7 @@ class UserController extends Controller
             $page = $request->shareselect;
         }
 
-        $data["data"] = User::with("staff")->orderBy("name", "asc")->paginate($page);
-        $data["roles"] = RoleUser::getList();
+        $data["data"] = User::with("staff", "role")->orderBy("name", "asc")->paginate($page);
         $data["filter"] = array("page" => $page);
         
         return view("user", $data);
@@ -50,10 +48,10 @@ class UserController extends Controller
      $data["staff"] = Staff::select("staff_id", "name")->get();
      $data["status"] = User::getStatus();
 
-     if(Session("role_id") == "0"){
+     if(Session("role_id") == "1"){
         $data["role"] = Role::select("role_id", "name")->get();
     }else{
-        $data["role"] = Role::select("role_id", "name")->where("code", ">", "0")->get();
+        $data["role"] = Role::select("role_id", "name")->where("code", ">", "1")->get();
     }
 
     return view("form.user", $data);
@@ -98,14 +96,8 @@ class UserController extends Controller
             $user->password             = Hash::make($request->password);
             $user->created_ip       = $request->ip();
             $user->status = $request->status;
-            
-            if($user->status == "active"){
-                $user->account_verified_at = date("Y-m-d h:i:s");
-            }
-            
-            if(isset(Auth::user()->user_id)){
-                $user->created_by       = Auth::user()->user_id;
-            }
+            $user->role_id = $request->role_id;
+            $user->created_by       = Auth::user()->user_id;
             
             if(isset($request->gambar) and $request->file('gambar')!=null){
                 $img = $request->file('gambar');
@@ -115,18 +107,6 @@ class UserController extends Controller
                 $user->profile_picture = $image[1];
             }
             $user->save();
-
-            // for role id
-            $role =  new RoleUser();
-            $role->user_id = $user->user_id;
-            $role->role_id = $request->role_id;
-            $role->created_ip       = $request->ip();
-
-            if(isset(Auth::user()->user_id)){
-                $role->created_by       = Auth::user()->user_id;
-            }
-
-            $role->save();
 
             DB::commit();
         } catch (Exception $e) {
@@ -154,8 +134,7 @@ class UserController extends Controller
             $image = 'data:'.mime_content_type($full_path) . ';base64,' . $base64;
             $user->profile_picture = $image;
         }
-        $cek =  RoleUser::where("user_id", $user->user_id)->get()->first();
-        $user->role_id = $cek->role_id;
+
         $data["staff"] = Staff::select("staff_id", "name")->get();
         $data["data"] = $user;
         $data["status"] = User::getStatus();
@@ -180,8 +159,9 @@ class UserController extends Controller
         if(Session("role_id") == "0"){
             $data["role"] = Role::select("role_id", "name")->get();
         }else{
-            $data["role"] = Role::select("role_id", "name")->where("code", ">", "0")->get();
+            $data["role"] = Role::select("role_id", "name")->where("code", ">", "1")->get();
         }
+
         if(Storage::exists('profile/'.$user->profile_picture)){
             $path = 'profile/'.$user->profile_picture;
             
@@ -190,9 +170,8 @@ class UserController extends Controller
             $image = 'data:'.mime_content_type($full_path) . ';base64,' . $base64;
             $user->profile_picture = $image;
         }
-        $cek =  RoleUser::where("user_id", $user->user_id)->get()->first();
-        $user->role_id = $cek->role_id;
-        $data["staff"] = Staff::select("staff_id", "name")->get();
+
+        $data["staff"] = Staff::select("staff_id", "name")->where("staff_id", $user->staff_id)->get();
         $data["data"] = $user;
         $data["status"] = User::getStatus();
 
@@ -261,8 +240,7 @@ class UserController extends Controller
             $user->profile_picture = $image;
         }
 
-        $role = RoleUser::where("user_id", $user->user_id)->get()->first();
-        $data["role"] = Role::where("role_id", $role->role_id)->get()->first();
+        $data["role"] = Role::where("role_id", $user->role_id)->get()->first();
         $data["data"] = $user;
 
         return view("form.profile-user", $data);
@@ -301,23 +279,15 @@ class UserController extends Controller
                 $user->phone            = $staff->phone;
                 $user->staff_id            = $staff->staff_id;
             }
-            $user->username             = $request->username;
-            
             if($request->password != null){
                 $user->password             = Hash::make($request->password);
             }
             
+            $user->username             = $request->username;
             $user->updated_ip       = $request->ip();
             $user->status = $request->status;
+            $user->updated_by       = Auth::user()->user_id;
 
-            if($user->status == "active"){
-                $user->account_verified_at = date("Y-m-d h:i:s");
-            }
-            
-            if(isset(Auth::user()->user_id)){
-                $user->updated_by       = Auth::user()->user_id;
-            }
-            
             if(isset($request->gambar) and $request->file('gambar')!=null){
                 if(Storage::exists('profile/'.$user->profile_picture)){
                     Storage::delete('profile/'.$user->profile_picture);
@@ -330,19 +300,6 @@ class UserController extends Controller
             }
 
             $user->save();
-
-            // this for role
-            $cek =  RoleUser::where("user_id", $user->user_id)->get()->first();
-            
-            $role = RoleUser::findOrFail($cek->user_role_id);
-            $role->role_id = $request->role_id;
-            $role->updated_ip       = $request->ip();
-            
-            if(isset(Auth::user()->user_id)){
-                $role->updated_by       = Auth::user()->user_id;
-            }
-            
-            $role->save();
 
             DB::commit();
         } catch (Exception $e) {

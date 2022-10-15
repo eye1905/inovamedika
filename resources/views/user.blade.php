@@ -52,12 +52,7 @@
 										{{ $value->username }}
 									</td>
 									<td>
-										@if(isset($roles[$value->user_id]))
-										@foreach($roles[$value->user_id] as $key2 => $value2)
-										- {{ ucfirst($value2->role) }}
-										<br>
-										@endforeach
-										@endif
+										@if(isset($value->role->name)){{ $value->role->name }}@endif
 									</td>
 									<td>
 										{{ $value->email }}
