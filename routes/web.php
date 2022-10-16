@@ -32,7 +32,7 @@ Route::group(['prefix' => '/auth'], function() {
     Route::get('/logout/{id?}', [AuthController::class, 'logout'])->name("logout");
 });
 
-Route::group(['prefix' => '/'], function() {
+Route::group(['prefix' => '/', 'middleware' => ['auth', 'checkrole']], function() {
 
     // this for master
     Route::resource('/home', DashboardController::class);

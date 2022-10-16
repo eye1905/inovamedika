@@ -8,6 +8,7 @@
         <form method="GET" action="{{ url()->current() }}" enctype="multipart/form-data" id="form-select">
             @csrf
             <input type="hidden" name="_method" value="GET">
+            @include("filter.filter-collapse")
             <div class="row">
                 <div class="col-sm-12 col-lg-12 col-xl-12">
                     <div class="table-responsive">
@@ -137,6 +138,8 @@
 @endsection
 
 @section("script")
+<script src="{{ URL::asset('js/select2/select2.full.min.js') }}"></script>
+<script src="{{ URL::asset('js/select2/select2-custom.js') }}"></script>
 <script type="text/javascript">
     $("#shareselect").change(function(){
         $("#_method").attr("method", "GET");
@@ -147,15 +150,36 @@
     $("#shareselect").val('{{ $filter["page"] }}');
     @endif
 
+    @if(isset($filter["f_patient_id"]))
+    $("#f_patient_id").val('{{ $filter["f_patient_id"] }}');
+    @endif
+
+    @if(isset($filter["f_medical_code"]))
+    $("#f_medical_code").val('{{ $filter["f_medical_code"] }}');
+    @endif
+
+    @if(isset($filter["f_status"]))
+    $("#f_status").val('{{ $filter["f_status"] }}');
+    @endif
+
+    @if(isset($filter["start_date"]))
+    $("#start_date").val('{{ $filter["start_date"] }}');
+    @endif
+    
+    @if(isset($filter["end_date"]))
+    $("#end_date").val('{{ $filter["end_date"] }}');
+    @endif
+
     function goGenerate(id) {
         $("#modal-tagihan").modal("show");
         $("#form-tagihan").attr("action", "{{ url("medical") }}/"+id+"/generate");
     }
-
+    
     function goBayar(id, total) {
         $("#modal-bayar").modal("show");
         $("#form-bayar").attr("action", "{{ url("medical") }}/"+id+"/payment");
         $("#nominal").val(total);
     }
+
 </script>
 @endsection

@@ -2,11 +2,7 @@
 	function addObat() {
 		$("#modal-obat").modal("show");
 	}
-
-	function goBayar() {
-		// body...
-	}
-
+	
 	function goEdit(id, obat, qty) {
 		$("#modal-obat").modal("show");
 		$("#form-obat").attr("action", "{{ url("medical") }}/"+id+"/updateobat");

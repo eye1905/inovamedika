@@ -40,7 +40,7 @@
         <label class="col-form-label">
           Biaya Pemeriksaan
         </label>
-        <input type="text" class="form-control" id="nominal" value="{{ StringHelper::toRupiah($data->nominal) }}" disabled readonly name="nominal" placeholder="Masukan biaya pemeriksaan">
+        <input type="text" class="form-control" value="{{ StringHelper::toRupiah($data->nominal) }}" disabled readonly  placeholder="Masukan biaya pemeriksaan">
       </div>
 
       <div class="col-md-4">
@@ -92,17 +92,21 @@
         <div class="col-md-6">
           <h4><i class="fa fa-medkit"></i> Data Obat</h4>
         </div>
-        @if($data->status=="1")
+        
         <div class="col-md-6 text-end">
-          <button type="button" class="btn btn-sm btn-success" onclick="goBayar()">
-            <i class="fa fa-money"></i> Pembayaran
-          </button>
-
+          @if($data->status=="1")
+          <a class="btn btn-sm btn-info" href="#" onclick="goGenerate('{{ $data->medical_id }}')">
+            <i class="fa fa-chevron-right"></i> Generate Tagihan
+          </a>
           <button type="button" class="btn btn-sm btn-primary" onclick="addObat()">
             <i class="fa fa-plus"></i> Tambah Obat
           </button>
+          @elseif($data->status=="2")
+          <button type="button" class="btn btn-sm btn-success" onclick="goBayar('{{ $data->medical_id }}', '{{ $data->total }}')">
+            <i class="fa fa-money"></i> Pembayaran
+          </button>
+          @endif
         </div>
-        @endif
       </div>
 
       <div class="col-md-12">
@@ -159,7 +163,29 @@
   </div>
 </div>
 
+<div class="modal fade bd-example-modal-sm" id="modal-tagihan" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="mySmallModalLabel">Apakah Anda ingin melakukan generate tagihan ?</h4>
+      </div>
+      <form method="POST" action="" enctype="multipart/form-data" id="form-tagihan">
+        @csrf
+        <div class="modal-body text-end">
+          <button type="submit" class="btn btn-md btn-success">
+            <i class="fa fa-save"></i> Iya
+          </button>
+          <button type="button" class="btn btn-md btn-danger" data-bs-dismiss="modal" aria-label="Close">
+            <i class="fa fa-times"></i> Tidak
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 @include("detail.modal-obat")
+@include("detail.modal-bayar")
 
 @endsection
 @section("script")
@@ -174,6 +200,18 @@
   @else
   $("#date").val('{{ date("Y-m-d") }}');
   @endif
+
+  function goGenerate(id) {
+    $("#modal-tagihan").modal("show");
+    $("#form-tagihan").attr("action", "{{ url("medical") }}/"+id+"/generate");
+  }
+
+  function goBayar(id, total) {
+    $("#modal-bayar").modal("show");
+    $("#form-bayar").attr("action", "{{ url("medical") }}/"+id+"/payment");
+    $("#nominal").val(total);
+  }
+
 </script>
 @include("detail.js-obat")
 @endsection

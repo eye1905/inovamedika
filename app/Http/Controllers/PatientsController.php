@@ -160,7 +160,7 @@ class PatientsController extends Controller
         $data["data"] = [];
         $data["tindakan"] = Checkup::orderBy("name", "asc")->get();
         $data["obat"] = Medicine::orderBy("name", "asc")->get();
-
+        
         return view("form.medical", $data);
     }
 

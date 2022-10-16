@@ -4,31 +4,22 @@
   <div class="card-body">
     @include("template.notif")
     <form method="POST" enctype="multipart/form-data" action="{{ url("medical") }}">
-      <input type="hidden" name="patient_id" value="{{ $pasien->patient_id }}"  id="patient_id">
       @csrf
       <div class="row">
         <div class="text-end">
-          <a href="{{ url("patient") }}" class="btn btn-sm btn-warning"><i class="fa fa-reply"></i> Kembali</a>
-        </div>
-        <div class="col-md-4">
-          <label class="col-form-label">
-            No. Rekam Medis
-          </label>
-          <input type="text" class="form-control" value="@if(isset($pasien->medical_record_number)){{ $pasien->medical_record_number }}@endif" disabled readonly>
+          <a href="{{ url("medical") }}" class="btn btn-sm btn-warning"><i class="fa fa-reply"></i> Kembali</a>
         </div>
 
         <div class="col-md-4">
           <label class="col-form-label">
-            Nama Pasien
+            Nama Pasien  <span class="text-danger"> *</span>
           </label>
-          <input type="text" class="form-control" value="@if(isset($pasien->name)){{ ucfirst($pasien->name) }}@endif" disabled readonly>
-        </div>
-
-        <div class="col-md-4">
-          <label class="col-form-label">
-            Jenis Kelamin
-          </label>
-          <input type="text" class="form-control" value="@if(isset($pasien->gender) and $pasien->gender=="male"){{ 'Laki-Laki' }}@else{{ 'Perempuan' }}@endif" disabled readonly>
+          <select class="js-example-basic-single col-sm-12" id="patient_id" name="patient_id" required>
+            <option value="">-- Semua Pasien --</option>
+            @foreach($pasien as $key => $value)
+            <option value="{{ $value->patient_id }}">{{ $value->name." ( ".$value->medical_record_number." )" }}</option>
+            @endforeach
+          </select>
         </div>
 
         <div class="col-md-4">
@@ -63,13 +54,6 @@
             Biaya Pemeriksaan {{ StringHelper::getNameMenu() }} berisi format nominal rupiah
           </label>
           @endif
-        </div>
-
-        <div class="col-md-4">
-          <label class="col-form-label">
-            Total Biaya
-          </label>
-          <input type="number" class="form-control" id="total" name="total" readonly disabled>
         </div>
 
         <div class="col-md-12 mt-2">
@@ -120,18 +104,6 @@
   $("#date").val('{{ date("Y-m-d") }}');
   @endif
 
-  @if(Request::segment(3)==null and  Request::segment(2)!="create")
-  // $(".form-control").attr("readonly", true);
-  // $(".form-control").attr("disabled",  true);
-  // $("input").attr("disabled",  true);
-  // $("input").attr("readonly", true);
-  // $(".form-control").css("background-color", "#FFFF");
-  @else
-  // $(".form-control").removeAttr("readonly");
-  // $(".form-control").removeAttr("disabled");
-  // $("input").removeAttr("disabled");
-  // $("input").removeAttr("readonly");
-  @endif
 </script>
 @include("detail.js-tindakan")
 @endsection

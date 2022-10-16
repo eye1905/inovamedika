@@ -27,7 +27,7 @@ class MedicalTreatment extends Model
     {
         $sql = "select m.*,p.name as pasien,p.gender,p.phone,s.name as staff from medical_treatments m 
         join patients p on m.patient_id = p.patient_id
-        left join staffs s on s.staff_id=m.staff_id where m.date >= '".$dr_tgl."' and m.date <='".$dr_tgl."' ";
+        left join staffs s on s.staff_id=m.staff_id where m.date >= '".$dr_tgl."' and m.date <='".$sp_tgl."' ";
 
         if($pasien != null){
             $sql .= " and m.patient_id ='".$pasien."' ";
@@ -36,12 +36,12 @@ class MedicalTreatment extends Model
         if($code != null){
             $sql .= " and m.medical_code ='".$code."' ";
         }
-
+        
         if($status != null){
             $sql .= " and m.status ='".$status."' ";
         }
 
-        $sql .= " order by m.date asc";
+        $sql .= " order by m.date desc";
 
         $data = DB::select(DB::raw($sql));
         $collect = collect($data);

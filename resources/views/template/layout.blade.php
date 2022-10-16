@@ -2,8 +2,8 @@
 $ses_login = Session("role_id");
 
 if($ses_login == 1){
-  $level1 = App\Models\Navigations::getMenu(1);
-  $level = App\Models\Navigations::getMenu(2);
+  $level1 = App\Models\Navigations::getMenu(1, $ses_login);
+  $level = App\Models\Navigations::getMenu(2, $ses_login);
 }else{
   $level1 = App\Models\RolePermition::getMenu(1, $ses_login);
   $level = App\Models\RolePermition::getMenu(2, $ses_login);

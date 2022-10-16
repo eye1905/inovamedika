@@ -39,11 +39,19 @@ class MedicalTreatmentController extends Controller
         $f_patient_id = $request->f_patient_id?$request->f_patient_id:null;
         $f_medical_code = $request->f_medical_code?$request->f_medical_code:null;
         $f_status = $request->f_status?$request->f_status:null;
-        $dr_tgl = $request->dr_tgl?$request->dr_tgl:date("Y-m-d");
-        $sp_tgl = $request->dr_tgl?$request->sp_tgl:date("Y-m-T");
+        $start_date = $request->start_date?$request->start_date:date('Y-m-01');
+        $end_date = $request->end_date?$request->end_date:date('Y-m-t');
 
-        $data["data"] = MedicalTreatment::getMedical($perpage, $page, $f_patient_id, $f_medical_code, $f_status, $dr_tgl, $sp_tgl);
-        $data["filter"] = array("page" => $perpage);
+        $data["data"] = MedicalTreatment::getMedical($perpage, $page, $f_patient_id, $f_medical_code, $f_status, $start_date, $end_date);
+        $data["code"] = MedicalTreatment::select("medical_code")->orderBy("date", "desc")->get();
+        $data["pasien"] = Patients::select("name", "patient_id")->orderBy("name", "asc")->get();
+        $data["filter"] = array("page" => $perpage, 
+                            "f_patient_id" => $f_patient_id,
+                            "f_medical_code" => $f_medical_code,
+                            "f_status" => $f_status,
+                            "start_date" => $start_date,
+                            "end_date" => $end_date);
+
         $data["metode"] = array("transfer" => "transfer",
                             "tunai" => "tunai",
                             "va" => "va",
@@ -62,7 +70,13 @@ class MedicalTreatmentController extends Controller
      */
     public function create()
     {
-        //
+        $patients = Patients::select("patient_id","medical_record_number" , "name")->orderBy("name", "asc")->get();
+        $data["data"] = [];
+        $data["pasien"] = $patients;
+        $data["tindakan"] = Checkup::orderBy("name", "asc")->get();
+        $data["obat"] = Medicine::orderBy("name", "asc")->get();
+
+        return view("form.create-medical", $data);
     }
 
     /**
@@ -91,6 +105,7 @@ class MedicalTreatmentController extends Controller
             $medical->medical_code          = "MT-".StringHelper::random_number(9);
             $medical->date             = $request->date;
             $medical->nominal             = $request->nominal?$request->nominal:0;
+            $medical->total                 = $medical->nominal;
             $medical->description       = $request->description;
             $medical->staff_id       = Auth::user()->staff_id;
             $medical->created_ip       = $request->ip();
@@ -98,7 +113,7 @@ class MedicalTreatmentController extends Controller
             $medical->is_payment = 0;
             $medical->status = 1;
             $medical->save();
-
+            
             $id = $medical->medical_id;
             
             // this for tindakan
@@ -252,6 +267,13 @@ class MedicalTreatmentController extends Controller
         $data["tindakan"] = Checkup::orderBy("name", "asc")->get();
         $data["obat"] = Medicine::orderBy("name", "asc")->get();
         $data["detail"] = MedicalMedicine::getDetail($id);
+        $data["metode"] = array("transfer" => "transfer",
+                            "tunai" => "tunai",
+                            "va" => "va",
+                            "va" => "va",
+                            "gopay" => "gopay",
+                            "shopeepay" => "shopeepay",
+                            "qris" => "qris");
         //dd($data);
         return view("detail.medical", $data);
     }
@@ -265,6 +287,13 @@ class MedicalTreatmentController extends Controller
         $data["tindakan"] = MedicalCheckup::getDetail($id);
         $data["obat"] = Medicine::orderBy("name", "asc")->get();
         $data["detail"] = MedicalMedicine::getDetail($id);
+        $data["metode"] = array("transfer" => "transfer",
+                            "tunai" => "tunai",
+                            "va" => "va",
+                            "va" => "va",
+                            "gopay" => "gopay",
+                            "shopeepay" => "shopeepay",
+                            "qris" => "qris");
 
         return view("detail.medical", $data);
     }
@@ -302,7 +331,7 @@ class MedicalTreatmentController extends Controller
     {
         abort(404);
     }
-
+    
     public function generate($id)
     {
         try {
