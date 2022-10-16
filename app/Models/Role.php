@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Session;
 
 class Role extends Model
 {
@@ -14,13 +15,18 @@ class Role extends Model
     public static function getList($id = null)
     {   
         $data = self::select("role_id", "code", "name");
+
+        if(Session("role_id")!="1"){
+            $data->where("code", ">", 1);
+        }
+        
         if($id != null){
             $data->where("role_id", $id);
         }
-        
-        $data->where("role_id", ">", 1);
 
-        return $data->get();
+        $data = $data->get();
+
+        return $data;
     }
 
     public static function getRoleCode($code = null)

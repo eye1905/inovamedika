@@ -46,7 +46,7 @@ class PermitionsController extends Controller
             $permit->where("role_id", $role_id);
         }
 
-        $data["role"] = Role::select("role_id", "name")->where("code", ">", "0")->orderBy("code", "asc")->get();
+        $data["role"] = Role::getList();
         $data["menu"] = Navigations::select("navigation_id", "name")->orderBy("position", "asc")->get();
         $data["data"] = $permit->paginate($page);
         $data["filter"] = array("page" => $page,
@@ -63,7 +63,7 @@ class PermitionsController extends Controller
      */
     public function create()
     {
-        $data["role"] = Role::select("role_id", "name")->where("code", ">", "0")->get();
+        $data["role"] = Role::getList();
         $data["menu"] = Navigations::select("navigation_id", "name")->get();
         $data["data"] = [];
 
@@ -140,7 +140,7 @@ class PermitionsController extends Controller
      */
     public function show($id)
     {
-        $data["role"] = Role::select("role_id", "name")->where("code", ">", "0")->get();
+        $data["role"] = Role::getList();
         $data["menu"] = Navigations::select("navigation_id", "name")->get();
         $data["data"] = RolePermition::findOrFail($id);
 
@@ -155,7 +155,7 @@ class PermitionsController extends Controller
      */
     public function edit($id)
     {
-        $data["role"] = Role::select("role_id", "name")->where("code", ">", "0")->get();
+        $data["role"] = Role::getList();
         $data["menu"] = Navigations::select("navigation_id", "name")->get();
         $data["data"] = RolePermition::findOrFail($id);
 

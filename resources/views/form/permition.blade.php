@@ -256,24 +256,19 @@
   @else
   $("#export").val('{{ old("export") }}');
   @endif
-
+  
   @if(Request::segment(3)==null and  Request::segment(2)!='create')
   $(".form-control").attr("readonly", true);
   $(".form-control").attr("disabled",  true);
-  $(".form-control").css("background-color", "#FFFF");
   $("input").attr("readonly", true);
   $("input").attr("disabled",  true);
+  $("select").attr("readonly", true);
+  $("select").attr("disabled",  true);
   @else
   $(".form-control").removeAttr("readonly");
   $(".form-control").removeAttr("disabled");
   $("input").removeAttr("readonly");
   $("input").removeAttr("disabled");
-  @endif
-
-  @if(Request::segment(3)=="edit")
-  $("select").attr("readonly", true);
-  $("select").attr("disabled",  true);
-  $(".form-control").css("background-color", "#FFFF");
   @endif
 
 </script>

@@ -11,6 +11,7 @@ use App\Http\Controllers\RegionsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\CheckupController;
+use App\Http\Controllers\PatientsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,4 +44,5 @@ Route::group(['prefix' => '/'], function() {
     Route::resource('checkup', CheckupController::class);
     Route::resource('staff', StaffController::class);
     Route::put('staff/{id}/changestatus', [StaffController::class, 'changestatus']);
+    Route::resource('/patient', PatientsController::class);
 });

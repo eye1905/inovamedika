@@ -36,7 +36,7 @@
 
           </div>
         </div>
-
+        
         <div class="col-md-8 row">
 
           <div class="col-md-6">
@@ -71,25 +71,6 @@
             @else
             <label class="text-notif">
               Nama {{ StringHelper::getNameMenu() }} di isi huruf, titik, koma, angka dan spasi  (4 - 100 Karakter)
-            </label>
-            @endif
-          </div>
-
-          <div class="col-md-6">
-            <label class="col-form-label">
-              Referral dokter
-            </label>
-
-            <select class="form-control" id="doctor_id" name="doctor_id">
-              <option value="">-- Pilih Referral --</option>
-              @foreach($doctor as $key => $value)
-              <option value="{{ $value->doctor_id }}">{{ StringHelper::ucsplit($value->name) }}</option>
-              @endforeach
-            </select>
-            
-            @if($errors->has('doctor_id'))
-            <label class="text-danger">
-              {{ $errors->first('doctor_id') }}
             </label>
             @endif
           </div>
@@ -150,25 +131,6 @@
             </label>
             @endif
           </div>
-        </div>
-
-        <div class="col-md-4">
-          <label class="col-form-label">
-            Jenis Pasien <span class="text-danger"> *</span>
-          </label>
-
-          <select class="js-example-basic-single col-sm-12" required id="patient_status_id" name="patient_status_id">
-            <option value="">-- Pilih Jenis Pasien --</option>
-            @foreach($jenis as $key => $value)
-            <option value="{{ $value->patient_status_id }}">{{ StringHelper::ucsplit($value->name) }}</option>
-            @endforeach
-          </select>
-
-          @if($errors->has('patient_status_id'))
-          <label class="text-danger">
-            {{ $errors->first('patient_status_id') }}
-          </label>
-          @endif
         </div>
 
         <div class="col-md-4">
@@ -234,25 +196,6 @@
           @else
           <label class="text-notif">
             Email {{ StringHelper::getNameMenu() }} berisi Email Valid (10 - 100 Karakter)
-          </label>
-          @endif
-        </div>
-
-        <div class="col-md-4">
-          <label class="col-form-label">
-            dpjp
-          </label>
-
-          <select class="form-control" id="dpjp_doctor_id" name="dpjp_doctor_id">
-            <option value="">-- Pilih dpjp --</option>
-            @foreach($dpjp as $key => $value)
-            <option value="{{ $value->doctor_id }}">{{ StringHelper::ucsplit($value->name) }}</option>
-            @endforeach
-          </select>
-
-          @if($errors->has('dpjp_doctor_id'))
-          <label class="text-danger">
-            {{ $errors->first('dpjp_doctor_id') }}
           </label>
           @endif
         </div>

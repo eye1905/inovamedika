@@ -1,14 +1,3 @@
-<div class="col-md-4">
-  <label class="col-form-label">
-    Referral
-  </label>
-  <select class="js-example-basic-single col-sm-12" id="doctor_id" name="doctor_id">
-    <option value="">-- Pilih Referral --</option>
-    @foreach($doctor as $key => $value)
-    <option value="{{ $value->doctor_id }}">{{ StringHelper::ucsplit($value->name) }}</option>
-    @endforeach
-  </select>
-</div>
 
 <div class="col-md-4">
   <label class="col-form-label">
@@ -24,19 +13,6 @@
 
 <div class="col-md-4">
   <label class="col-form-label">
-    Jenis Pasien
-  </label>
-
-  <select class="js-example-basic-single col-sm-12" id="patient_status_id" name="patient_status_id">
-    <option value="">-- Pilih Jenis Pasien --</option>
-    @foreach($jenis as $key => $value)
-    <option value="{{ $value->patient_status_id }}">{{ StringHelper::ucsplit($value->name) }}</option>
-    @endforeach
-  </select>
-</div>
-
-<div class="col-md-4">
-  <label class="col-form-label">
     Jenis Kelamin 
   </label>
 
@@ -45,12 +21,16 @@
     <option value="male">Laki - Laki</option>
     <option value="female">Perempuan</option>
   </select>
+</div>
 
-  @if($errors->has('kelamin'))
-  <label class="text-danger">
-    {{ $errors->first('kelamin') }}
+<div class="col-md-4">
+  <label class="col-form-label">
+    Wilayah Asal 
   </label>
-  @endif
+
+  <select class="form-control" id="f_wilayah" name="f_wilayah">
+    <option value="">-- Pilih Semua Wilayah --</option>
+  </select>
 </div>
 
 <div class="col-md-4">
@@ -67,7 +47,7 @@
   <input type="date" class="form-control" id="end_date" name="end_date">
 </div>
 
-<div class="col-md-12 mt-2 text-end">
+<div class="col-md-4" style="margin-top: 40px">
   <button class="btn btn-sm btn-primary" type="submit">
     <i class="fa fa-search"></i> Cari
   </button>
