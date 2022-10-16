@@ -7,6 +7,9 @@
       <input type="hidden" name="patient_id" value="{{ $pasien->patient_id }}"  id="patient_id">
       @csrf
       <div class="row">
+        <div class="text-end">
+          <a href="{{ url("patient") }}" class="btn btn-sm btn-warning"><i class="fa fa-reply"></i> Kembali</a>
+        </div>
         <div class="col-md-4">
           <label class="col-form-label">
             No. Rekam Medis
@@ -45,12 +48,36 @@
           @endif
         </div>
 
-        <div class="col-md-8 mt-2">
+        <div class="col-md-4">
+          <label class="col-form-label">
+            Biaya Pemeriksaan
+          </label>
+          <input type="number" class="form-control" id="nominal" name="nominal" placeholder="Masukan biaya pemeriksaan">
+
+          @if($errors->has('date'))
+          <label class="text-danger">
+            {{ $errors->first('date') }}
+          </label>
+          @else
+          <label class="text-notif">
+            Biaya Pemeriksaan {{ StringHelper::getNameMenu() }} berisi format tanggal (dd-mm-yy)
+          </label>
+          @endif
+        </div>
+
+        <div class="col-md-4">
+          <label class="col-form-label">
+            Total Biaya
+          </label>
+          <input type="number" class="form-control" id="total" name="total" readonly disabled>
+        </div>
+
+        <div class="col-md-12 mt-2">
           <label class="col-form-label">
             Keterangan Pemeriksaan <span class="text-danger"> *</span>
           </label>
 
-          <textarea name="description" style="height: 200px" id="description" required placeholder="Masukan Keterangan Pemeriksaan" class="form-control">@if(isset($data->description)){{ $data->description }}@else{{ old('description') }}@endif</textarea>
+          <textarea name="description" style="height: 100px" id="description" required placeholder="Masukan Keterangan Pemeriksaan" class="form-control">@if(isset($data->description)){{ $data->description }}@else{{ old('description') }}@endif</textarea>
 
           @if($errors->has('description'))
           <label class="text-danger">
@@ -59,18 +86,19 @@
           @endif
         </div>
 
+        <div class="col-md-12 mt-2">
+          @include("detail.tindakan")
+        </div>
+
         @if(!request()->routeIs('medical.show'))
         <div class="col-md-12 mt-4 text-center">
           <button class="btn btn-sm btn-success">
-            Selesai Pemeriksaan
+            Resep Obat
             <i class="fa fa-chevron-right"></i>
           </button>
         </div>
         @endif
 
-        <div class="col-md-6">
-          @include("detail.tindakan")
-        </div>
       </div>
 
     </form>
@@ -93,18 +121,17 @@
   @endif
 
   @if(Request::segment(3)==null and  Request::segment(2)!="create")
-  $(".form-control").attr("readonly", true);
-  $(".form-control").attr("disabled",  true);
-  $("input").attr("disabled",  true);
-  $("input").attr("readonly", true);
-  $(".form-control").css("background-color", "#FFFF");
+  // $(".form-control").attr("readonly", true);
+  // $(".form-control").attr("disabled",  true);
+  // $("input").attr("disabled",  true);
+  // $("input").attr("readonly", true);
+  // $(".form-control").css("background-color", "#FFFF");
   @else
-  $(".form-control").removeAttr("readonly");
-  $(".form-control").removeAttr("disabled");
-  $("input").removeAttr("disabled");
-  $("input").removeAttr("readonly");
+  // $(".form-control").removeAttr("readonly");
+  // $(".form-control").removeAttr("disabled");
+  // $("input").removeAttr("disabled");
+  // $("input").removeAttr("readonly");
   @endif
-
-
 </script>
+@include("detail.js-tindakan")
 @endsection

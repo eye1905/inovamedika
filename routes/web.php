@@ -53,4 +53,10 @@ Route::group(['prefix' => '/'], function() {
     Route::get('patient/{id}/medical', [PatientsController::class, 'medical']);
 
     Route::resource('/medical', MedicalTreatmentController::class, ['names' => 'medical']);
+    Route::get('medical/{id}/medicine', [MedicalTreatmentController::class, 'medicine']);
+    Route::post('medical/{id}/saveobat', [MedicalTreatmentController::class, 'saveobat']);
+    Route::post('medical/{id}/updateobat', [MedicalTreatmentController::class, 'updateobat']);
+    Route::get('medical/{id}/deleteobat', [MedicalTreatmentController::class, 'deleteobat']);
+    Route::post('medical/{id}/generate', [MedicalTreatmentController::class, 'generate']);
+    Route::post('medical/{id}/payment', [MedicalTreatmentController::class, 'payment']);
 });

@@ -27,7 +27,7 @@
           <label class="col-form-label">
             Staf
           </label>
-          <select class="form-control" id="staff_id" name="staff_id">
+          <select class="form-control js-example-basic-single" id="staff_id" name="staff_id">
             <option value="">-- Pilih Staf --</option>
             @foreach($staff as $key => $value)
             <option value="{{ $value->staff_id }}">{{ ucfirst($value->name) }}</option>
@@ -115,6 +115,8 @@
 </div>
 @endsection
 @section("script")
+<script src="{{ URL::asset('js/select2/select2.full.min.js') }}"></script>
+<script src="{{ URL::asset('js/select2/select2-custom.js') }}"></script>
 <script type="text/javascript">
 
   $(function(){

@@ -18,6 +18,8 @@ use Maatwebsite\Excel\Facades\Excel;
 Use Response;
 use Illuminate\Support\Facades\File;
 use App\Exports\PasienExport;
+use App\Models\Checkup;
+use App\Models\Medicine;
 
 class PatientsController extends Controller
 {
@@ -156,6 +158,8 @@ class PatientsController extends Controller
         $patients = Patients::findOrFail($id);
         $data['pasien']  = $patients;
         $data["data"] = [];
+        $data["tindakan"] = Checkup::orderBy("name", "asc")->get();
+        $data["obat"] = Medicine::orderBy("name", "asc")->get();
 
         return view("form.medical", $data);
     }

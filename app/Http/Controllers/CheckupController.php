@@ -151,7 +151,7 @@ class CheckupController extends Controller
             DB::commit();
         } catch (Exception $e) {
             DB::rollback();
-            return redirect()->back()->with('error', 'Data tindakan Gagal dihapus' )->withInput($request->input());;
+            return redirect()->back()->with('error', 'Data tindakan Gagal dihapus' );
         }
         
         return redirect()->back()->with('success', 'Data tindakan dihapus');

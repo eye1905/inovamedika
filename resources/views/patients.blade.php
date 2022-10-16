@@ -71,12 +71,18 @@
 											<a class="dropdown-item" href="#" onclick="changeStatus('{{ $value->patient_id }}', '{{ $value->status }}')">
 												<i class="fa fa-pencil"></i> Ubah Status
 											</a>
+
 											<a class="dropdown-item" href="{{ url(Request::segment(1)."/".$value->patient_id."/edit") }}">
 												<i class="fa fa-edit"></i> Edit
 											</a>
+
+											<a class="dropdown-item" href="{{ url(Request::segment(1)."/".$value->patient_id."/medical") }}">
+												<i class="fa fa-chevron-right"></i> Pemeriksaan Medis
+											</a>
 											@endif
 
-											@if(StringHelper::getAccess("update_permission")==true)
+
+											@if(StringHelper::getAccess("delete_permission")==true)
 											<a class="dropdown-item" href="#" onclick="CheckDelete('{{ url(Request::segment(1)) }}/{{ $value->patient_id }}')">
 												<i class="fa fa-times"></i> Hapus
 											</a>

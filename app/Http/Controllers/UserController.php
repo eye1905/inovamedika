@@ -26,7 +26,7 @@ class UserController extends Controller
     {
         $page = 10;
         $roles = Session("role_id");
-
+        
         if(isset($request->shareselect) and $request->shareselect != null){
             $page = $request->shareselect;
         }
@@ -91,7 +91,6 @@ class UserController extends Controller
                 $user->staff_id            = $staff->staff_id;
             }
             
-            $user->user_uuid        = StringHelper::generate_uuid();
             $user->username             = $request->username;
             $user->password             = Hash::make($request->password);
             $user->created_ip       = $request->ip();
@@ -111,7 +110,7 @@ class UserController extends Controller
             DB::commit();
         } catch (Exception $e) {
             DB::rollback();
-            return redirect()->back()->with('error', 'Data user Gagal Disimpan' )->withInput($request->input());;
+            return redirect()->back()->with('error', 'Data user Gagal Disimpan'.$e->getMessage())->withInput($request->input());
         }
         
         return redirect("user")->with('success', 'Data user Disimpan');
@@ -156,12 +155,12 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = User::findOrFail($id);
-        if(Session("role_id") == "0"){
+        if(Session("role_id") == "1"){
             $data["role"] = Role::select("role_id", "name")->get();
         }else{
             $data["role"] = Role::select("role_id", "name")->where("code", ">", "1")->get();
         }
-
+        
         if(Storage::exists('profile/'.$user->profile_picture)){
             $path = 'profile/'.$user->profile_picture;
             

@@ -71,15 +71,10 @@
 										@endif
 									</td>
 									<td width="200" class="text-center">
+										@if(Session("role_id") != "1" and $value->role->role_id !="1")
 										<button class="btn btn-sm btn-info dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action</button>
 										<div class="dropdown-menu">
 											@if(StringHelper::getAccess("update_permission")==true)
-											{{-- <a class="dropdown-item" href="#">
-												<i class="fa fa-retweet"></i> Ganti Role
-											</a>
-											<a class="dropdown-item" href="#">
-												<i class="fa fa-pencil"></i> Ubah Status
-											</a> --}}
 											<a class="dropdown-item" href="{{ url(Request::segment(1)."/".$value->user_id."/edit") }}">
 												<i class="fa fa-edit"></i> Edit
 											</a>
@@ -90,6 +85,7 @@
 											</a>
 											@endif
 										</div>
+										@endif
 									</td>
 								</tr>
 								@endforeach
