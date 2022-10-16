@@ -78,8 +78,8 @@ class PatientsController extends Controller
     public function create()
     {
         $data["data"] = [];
-        $data["wilayah"] = Regions::getWilayah();
-        
+        $data["wilayah"] = Regions::getSelect2();
+        //dd($data);
         return view("form.patients", $data);
     }
 
@@ -95,7 +95,7 @@ class PatientsController extends Controller
             'record'  => 'bail|required|alpha_num|min:3|max:50|unique:'.env('DB_CONNECTION').'.'.env('DB_DATABASE').'.patients,medical_record_number',
             'name'  => 'bail|required|gelar|min:4|max:100',
             'kelamin'  => 'bail|required|in:male,female',
-            'patient_status_id' => 'bail|required|exists:'.env('DB_CONNECTION').'.'.env('DB_DATABASE').'.patient_status,patient_status_id',
+            'region_id' => 'bail|required|exists:'.env('DB_CONNECTION').'.'.env('DB_DATABASE').'.regions,id_wil',
             'birthplace'  => 'bail|nullable|alphanum_spaces|max:255',
             'birthdate'  => 'bail|nullable|date',
             'first_entry'  => 'bail|required|date',
@@ -103,8 +103,6 @@ class PatientsController extends Controller
             'phone'  => 'bail|required|digits_between:6,13|unique:'.env('DB_CONNECTION').'.'.env('DB_DATABASE').'.patients,phone',
             'address'  => 'bail|required|max:100|min:5',
             'status'  => 'bail|nullable|in:active,inactive',
-            'doctor_id'  => 'bail|nullable|exists:'.env('DB_CONNECTION').'.'.env('DB_DATABASE').'.doctors,doctor_id',
-            'dpjp_doctor_id'  => 'bail|nullable|exists:'.env('DB_CONNECTION').'.'.env('DB_DATABASE').'.doctors,doctor_id',
             'gambar'  => 'bail|nullable|image|mimes:JPG,JPEG,PNG,GIF,SVG,jpg,png,jpeg,gif,svg|max:2048',
         ]);
 
@@ -128,24 +126,10 @@ class PatientsController extends Controller
             $patients->first_entry             = $request->first_entry;
             $patients->address             = $request->address;
             $patients->status             = $request->status;
+            $patients->region_id             = $request->region_id;
             $patients->created_ip       = $request->ip();
-            $patients->patient_status_id = $request->patient_status_id;
-
-            if(isset($request->doctor_id) and $request->doctor_id != null){
-                $patients->referral_doctor_id = $request->doctor_id;
-            }
-
-            if(isset($request->dpjp_doctor_id) and $request->dpjp_doctor_id != null){
-                $patients->dpjp_doctor_id = $request->dpjp_doctor_id;
-            }
-
-            if(isset($request->status) and $request->status == null){
-                $patients->status = "inactive";
-            }            
-            
-            if(isset(Auth::user()->user_id)){
-                $patients->created_by       = Auth::user()->user_id;
-            }
+            $patients->status           = $request->status?$request->status:"inactive";
+            $patients->created_by       = Auth::user()->user_id;
             
             if(isset($request->gambar) and $request->file('gambar')!=null){
                 $img = $request->file('gambar');
@@ -154,29 +138,9 @@ class PatientsController extends Controller
                 $image = explode("/", $path_img);
                 $patients->picture = $image[1];
             }
-
+            //dd($patients);
             $patients->save();
             $id = $patients->patient_id;
-
-            if(isset($request->doctor_id) and $request->doctor_id != null){
-                $nominal = 0;
-                $setting = SettingReferral::get()->first();
-                if(isset($setting->pasien_baru) and $setting->pasien_baru != null){
-                    $nominal = $setting->pasien_baru;
-                }
-                
-                $ref = new HistoryReferral();
-                $ref->id_history = HistoryReferral::generateId();
-                $ref->doctor_id = $request->doctor_id;
-                $ref->nominal = $nominal;
-                $ref->date_referral = date("Y-m-d");
-                $ref->type= "pasien";
-                $ref->created_ip       = $patients->created_ip;
-                $ref->created_by       = $patients->created_by;
-                if($ref->nominal > 0){
-                    $ref->save();
-                }
-            }
 
             DB::commit();
         } catch (Exception $e) {
@@ -184,160 +148,16 @@ class PatientsController extends Controller
             return redirect()->back()->with('error', 'Data pasien Gagal Disimpan' )->withInput($request->input());
         }
         
-        return redirect("patient/".$patients->patient_id."/package")->with('success', 'Data pasien Disimpan');
+        return redirect("patient/".$patients->patient_id."/medical")->with('success', 'Data pasien Disimpan');
     }
-    
-    public function package($id)
+
+    public function medical(Request $request, $id)
     {
         $patients = Patients::findOrFail($id);
-        if($patients->picture != null and Storage::exists('patients/'.$patients->picture)){
-            $path = 'patients/'.$patients->picture;
-
-            $full_path = Storage::path($path);
-            $base64 = base64_encode(Storage::get($path));
-            $image = 'data:'.mime_content_type($full_path) . ';base64,' . $base64;
-            $patients->picture = $image;
-        }else{
-            $path = asset("images/no-image.png");
-            $patients->picture = $path;
-        }
-        
-        $patients->usia = StringHelper::datedifferent(date("Y-m-d"), $patients->birthdate);
+        $data['pasien']  = $patients;
         $data["data"] = [];
-        $data["pasien"] = $patients;
-        $data["paket"] = Package::orderBy("name", "asc")->get();
-        $data["terapis"] = Staff::getTerapis();
-        $data["times"] = Schedule::select("start_clock", "end_clock", "schedule_shift_id")->get();
-        $data["diagnosa"] = Diagnoses::select("diagnose_id", "name")->get();
 
-        return view("detail.patients-package", $data);
-    }
-    
-    public function schedule($id)
-    {
-        $package = PatientsPackage::findOrFail($id);
-        $patients = Patients::findOrFail($package->patient_id);
-        $patients->usia = StringHelper::datedifferent(date("Y-m-d"), $patients->birthdate);
-        $detail = PatientsPackageMeet::getdetail($id);
-        $data["data"] = $package;
-        $data["detail"] = $detail;
-        $data["pasien"] = $patients;
-        
-        return view("detail.schedule", $data);
-    }
-
-    public function savepackage(Request $request, $id)
-    {
-        $date = date("Y-m-d");
-        $yesterday = date('Y-m-d',(strtotime('-1 day', strtotime($date))));
-
-        $validator = Validator::make($request->all(), [
-            'diagnose_id'  => 'bail|required|exists:'.env('DB_CONNECTION').'.'.env('DB_DATABASE').'.diagnoses,diagnose_id',
-            'package_id'  => 'bail|required|exists:'.env('DB_CONNECTION').'.'.env('DB_DATABASE').'.packages,package_id',
-            'times'  => 'bail|required|exists:'.env('DB_CONNECTION').'.'.env('DB_DATABASE').'.schedule_shifts,schedule_shift_id',
-            'staff_id'  => 'bail|required|exists:'.env('DB_CONNECTION').'.'.env('DB_DATABASE').'.staffs,staff_id',
-            'registration_date' => 'bail|required|date_format:Y-m-d',
-            'note'=> 'bail|nullable|max:255'
-        ]);
-        
-        if ($validator->fails())
-        {
-            return redirect()->back()->with('errors', $validator->errors())->withInput($request->input());
-        }
-        
-        $package_id = null;
-        try {
-            DB::beginTransaction();
-            $patients = Patients::findOrFail($id);
-            // get total and ready meet in patient packages
-            $ready = Package::getReady($request->package_id, $id);
-            $sisa = $ready["total"] - $ready["ready"];
-            
-            if($sisa != 0){
-                return redirect("appointment/".$package_id)->with('success', 'Paket Treatment Pasien telah dibuat, silahkan atur jadwal treatment');
-            }
-            
-            // save patients package
-            $package                   = new PatientsPackage();
-            $package->patient_id             = $id;
-            $package->diagnose_id             = $request->diagnose_id;
-            $package->package_id             = $request->package_id;
-            $package->total_meet             = $ready["total"];
-            $package->remaining_meet             = $ready["ready"];
-            $package->note             = $request->note;
-            $package->registration_date             = $request->registration_date;
-            $package->registration_code             = PatientsPackage::RegisterationCode();
-            $package->created_ip       = $request->ip();
-            if(isset(Auth::user()->user_id)){
-                $package->created_by       = Auth::user()->user_id;
-            }
-
-            $package->save();
-            $package_id = $package->patient_package_id;
-
-            $schedule = ScheduleTerapi::where("staff_id", $request->staff_id)
-            ->where("schedule_shift_id", $request->times)
-            ->get()->first();
-
-            // this for patient package meets
-            $meet = [];
-            for($i = 0; $i< $ready["ready"]; $i++){
-                $meet[$i]["patient_package_id"] = $package_id;
-                $meet[$i]["physiotherapist_schedule_id"] = $request->staff_id;
-                $kali = 7*$i;  
-                $date = strtotime($request->registration_date);
-                $date = strtotime("+".$kali." day", $date);
-                $date = date("Y-m-d", $date);
-                $meet[$i]["date_scheduled"] = $date;
-                $meet[$i]["physiotherapist_schedule_id"] = $schedule->physiotherapis_schedule_id;
-                $meet[$i]["created_ip"]       = $request->ip();
-                if(isset(Auth::user()->user_id)){
-                    $meet[$i]["created_by"]       = Auth::user()->user_id;
-                }
-                $meet[$i]["created_at"] = date("Y-m-d H:i:s");
-                $meet[$i]["updated_at"] = date("Y-m-d H:i:s");
-                $meet[$i]["staff_id"] = $request->staff_id;
-                $meet[$i]["package_id"] = $request->package_id;
-                $meet[$i]["meeting_index"] = $i+1;
-                $meet[$i]["is_assesment"] = 0;
-                $meet[$i]["is_claimed"] = 0;
-            }
-            
-            PatientsPackageMeet::insert($meet);
-            
-            // set notifikasi
-            $ide = PatientsPackageMeet::where("patient_package_id", $package_id)
-                    ->orderBy("meeting_index", "asc")->get()->first();
-                    
-            PatientsPackageMeet::notifFisio($ide->patient_package_meet_id);
-            PatientsPackageMeet::notifPasien($ide->patient_package_meet_id);;
-
-            // this for referral
-            if(isset($patients->referral_doctor_id) and $patients->referral_doctor_id != null){
-                $nominal = 0;
-                $setting = SettingReferral::get()->first();
-                if(isset($setting->treatment_baru) and $setting->treatment_baru != null){
-                    $nominal = $setting->treatment_baru;
-                }
-
-                $ref = new HistoryReferral();
-                $ref->id_history = HistoryReferral::generateId();
-                $ref->doctor_id = $patients->referral_doctor_id;
-                $ref->nominal = $nominal;
-                $ref->date_referral = date("Y-m-d");
-                $ref->type= "paket";
-                $ref->created_ip       = $package->created_ip;
-                $ref->created_by       = $package->created_by;
-                $ref->save();
-            }
-
-            DB::commit();
-        } catch (Exception $e) {
-            DB::rollback();
-            return redirect()->back()->with('error', 'Paket Treatment Pasien gagal disimpan' )->withInput($request->input());
-        }
-        
-        return redirect("appointment/".$package_id)->with('success', 'Paket Treatment Pasien dibuat');
+        return view("form.medical", $data);
     }
 
     /**
@@ -360,11 +180,9 @@ class PatientsController extends Controller
             $path = asset("images/no-image.png");
             $patients->picture = $path;
         }
-
-        $data["jenis"] = PatientStatus::select("name", "patient_status_id")->orderBy("name", "asc")->get();
-        $data["doctor"] = Doctors::getActive("referral");
-        $data["dpjp"] = Doctors::getActive("dpjp");
+        $data["wilayah"] = Regions::getSelect2();
         $data["data"] = $patients;
+
         return view("form.patients", $data);
     }
     
@@ -407,10 +225,10 @@ class PatientsController extends Controller
             $path = asset("images/no-image.png");
             $patients->picture = $path;
         }
-        $data["jenis"] = PatientStatus::select("name", "patient_status_id")->orderBy("name", "asc")->get();
-        $data["doctor"] = Doctors::getActive("referral");
-        $data["dpjp"] = Doctors::getActive("dpjp");
+
+        $data["wilayah"] = Regions::getSelect2();
         $data["data"] = $patients;
+
         return view("form.patients", $data);
     }
 

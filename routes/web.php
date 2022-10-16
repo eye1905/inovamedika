@@ -12,6 +12,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\CheckupController;
 use App\Http\Controllers\PatientsController;
+use App\Http\Controllers\MedicalTreatmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +33,8 @@ Route::group(['prefix' => '/auth'], function() {
 });
 
 Route::group(['prefix' => '/'], function() {
+
+    // this for master
     Route::resource('/home', DashboardController::class);
     Route::resource('regions', RegionsController::class);
     Route::resource('menu', NavigationsController::class)->except("show");
@@ -44,5 +47,10 @@ Route::group(['prefix' => '/'], function() {
     Route::resource('checkup', CheckupController::class);
     Route::resource('staff', StaffController::class);
     Route::put('staff/{id}/changestatus', [StaffController::class, 'changestatus']);
+
+    // this for transaksi
     Route::resource('/patient', PatientsController::class);
+    Route::get('patient/{id}/medical', [PatientsController::class, 'medical']);
+
+    Route::resource('/medical', MedicalTreatmentController::class, ['names' => 'medical']);
 });

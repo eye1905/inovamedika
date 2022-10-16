@@ -58,7 +58,7 @@ class Regions extends Model
         foreach($kota as $key => $value){
             if(isset($kec2[$value->id_wil])){
                 foreach($kec2[$value->id_wil] as $key2 => $value2){
-
+                    
                 }
             }
         }

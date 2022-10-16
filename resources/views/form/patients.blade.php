@@ -7,7 +7,7 @@
     @include("template.notif")
 
     <form method="POST" enctype="multipart/form-data" action="@if(Request::segment(2)=='create'){{ url(Request::segment(1)) }}@else{{ url(Request::segment(1), $data->patient_id) }}@endif">
-
+      
       @csrf
       @if(Request::segment(3)=="edit")
       {{ method_field("PUT") }}
@@ -131,25 +131,44 @@
             </label>
             @endif
           </div>
+
+          <div class="col-md-6">
+            <label class="col-form-label">
+              Kota Asal <span class="text-danger"> *</span>
+            </label>
+
+            <select class="form-control js-example-basic-single" required id="region_id" name="region_id">
+              <option value="">-- Pilih Kota Asal --</option>
+              @foreach($wilayah as $key => $value)
+              <option value="{{ $value->id_wil }}">{{ $value->kota }}</option>
+              @endforeach
+            </select>
+
+            @if($errors->has('region_id'))
+            <label class="text-danger">
+              {{ $errors->first('region_id') }}
+            </label>
+            @endif
+          </div>
         </div>
 
         <div class="col-md-4">
-          <label class="col-form-label">
-            Tanggal Terdaftar {{ StringHelper::getNameMenu() }} <span class="text-danger"> *</span>
-          </label>
+            <label class="col-form-label">
+              Tanggal Terdaftar {{ StringHelper::getNameMenu() }} <span class="text-danger"> *</span>
+            </label>
 
-          <input type="date" class="form-control" id="first_entry" name="first_entry" placeholder="Masukan Tgl Terdaftar {{ StringHelper::getNameMenu() }}">
+            <input type="date" class="form-control" id="first_entry" name="first_entry" placeholder="Masukan Tgl Terdaftar {{ StringHelper::getNameMenu() }}">
 
-          @if($errors->has('first_entry'))
-          <label class="text-danger">
-            {{ $errors->first('first_entry') }}
-          </label>
-          @else
-          <label class="text-notif">
-            Tgl terdaftar {{ StringHelper::getNameMenu() }} berisi format tanggal (dd-mm-yy)
-          </label>
-          @endif
-        </div>
+            @if($errors->has('first_entry'))
+            <label class="text-danger">
+              {{ $errors->first('first_entry') }}
+            </label>
+            @else
+            <label class="text-notif">
+              Tgl terdaftar {{ StringHelper::getNameMenu() }} berisi format tanggal (dd-mm-yy)
+            </label>
+            @endif
+          </div>
 
         <div class="col-md-4">
           <label class="col-form-label">
@@ -220,7 +239,7 @@
         @elseif(Request::segment(2)=="create")
         <div class="col-md-12 mt-4 text-center">
           <button class="btn btn-sm btn-primary">
-           Buat Paket 
+           Lanjut Ke Pemeriksaan 
            <i class="fa fa-chevron-right"></i>
          </button>
        </div>
@@ -284,22 +303,18 @@
   $("#birthdate").val('{{ old("birthdate") }}');
   @endif
 
+  @if(isset($data->region_id))
+  $("#region_id").val('{{ $data->region_id }}');
+  @else
+  $("#region_id").val('{{ old("region_id") }}');
+  @endif
+  
   @if(isset($data->first_entry))
   $("#first_entry").val('{{ date("Y-m-d", strtotime($data->first_entry)) }}');
-  @else
+  @elseif(old("first_entry")!=null)
   $("#first_entry").val('{{ old("first_entry") }}');
-  @endif
-
-  @if(isset($data->referral_doctor_id))
-  $("#doctor_id").val('{{ $data->referral_doctor_id }}');
   @else
-  $("#doctor_id").val('{{ old("doctor_id") }}');
-  @endif
-
-  @if(isset($data->dpjp_doctor_id))
-  $("#dpjp_doctor_id").val('{{ $data->dpjp_doctor_id }}');
-  @else
-  $("#dpjp_doctor_id").val('{{ old("dpjp_doctor_id") }}');
+  $("#first_entry").val('{{ date("Y-m-d") }}');
   @endif
 
   @if(Request::segment(3)==null and  Request::segment(2)!="create")
