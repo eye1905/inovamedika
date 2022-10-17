@@ -94,6 +94,7 @@ class StringHelper
 
     public static function getNameMenu($uri = null)
     {
+        $nav_menu = null;
         if($uri != null){
             $nav_menu = Navigations::select("name")->where("uri", $uri)->get()->first();
         }else{

@@ -399,4 +399,57 @@ class MedicalTreatmentController extends Controller
         
         return redirect()->back()->with('success', 'Tagihan sudah dibayar');
     }
+
+    public function repportmedical(Request $request)
+    {
+        $f_patient_id = $request->f_patient_id?$request->f_patient_id:null;
+        $f_medical_code = $request->f_medical_code?$request->f_medical_code:null;
+        $f_status = $request->f_status?$request->f_status:null;
+        $start_date = $request->start_date?$request->start_date:date('Y-m-01');
+        $end_date = $request->end_date?$request->end_date:date('Y-m-t');
+
+        $data["data"] = MedicalTreatment::getReportMedical($f_patient_id, $f_medical_code, $f_status, $start_date, $end_date);
+        $data["code"] = MedicalTreatment::select("medical_code")->orderBy("date", "desc")->get();
+        $data["pasien"] = Patients::select("name", "patient_id")->orderBy("name", "asc")->get();
+        $data["tindakan"] = Checkup::getListTindakan();
+        $data["obat"] = Medicine::getListObat();
+        $data["filter"] = array( 
+                            "f_patient_id" => $f_patient_id,
+                            "f_medical_code" => $f_medical_code,
+                            "f_status" => $f_status,
+                            "start_date" => $start_date,
+                            "end_date" => $end_date);
+
+        $data["metode"] = array("transfer" => "transfer",
+                            "tunai" => "tunai",
+                            "va" => "va",
+                            "va" => "va",
+                            "gopay" => "gopay",
+                            "shopeepay" => "shopeepay",
+                            "qris" => "qris");
+
+        return view("report.medical", $data);
+    }
+
+    public function cetakmedical(Request $request)
+    {
+        $f_patient_id = $request->f_patient_id?$request->f_patient_id:null;
+        $f_medical_code = $request->f_medical_code?$request->f_medical_code:null;
+        $f_status = $request->f_status?$request->f_status:null;
+        $start_date = $request->start_date?$request->start_date:date('Y-m-01');
+        $end_date = $request->end_date?$request->end_date:date('Y-m-t');
+        $format = $request->format;
+
+        $data["data"] = MedicalTreatment::getReportMedical($f_patient_id, $f_medical_code, $f_status, $start_date, $end_date);
+        $data["tindakan"] = Checkup::getListTindakan();
+        $data["obat"] = Medicine::getListObat();
+        if($format == "pdf"){
+            $name = "Laporan".request()->segment(1).date("Y/m/d");
+            $pdf = PDF::loadview("print.medical", $data)
+            ->setOptions(['defaultFont' => 'sans-serif'])->setPaper('folio', 'landscape');
+            return $pdf->stream();
+        }
+
+        return view("print.medical", $data);
+    }
 }

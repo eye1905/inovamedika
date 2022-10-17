@@ -18,10 +18,8 @@
 									<th scope="col">Nama
 										{{ StringHelper::getNameMenu("patient") }}
 									</th>
-									<th scope="col">Referral Dokter</th>
 									<th scope="col">Jenis Kelamin</th>
 									<th scope="col">Kontak</th>
-									<th>Jenis</th>
 									<th scope="col">Tgl. Registerasi</th>
 									<th scope="col">Usia</th>
 									<th scope="col">Status</th>
@@ -44,13 +42,6 @@
 										{{ $value->medical_record_number }}
 									</td>
 									<td>
-										@if(isset($value->refferal->name))
-										{{ $value->refferal->name }}
-										@else
-										<b>-</b>
-										@endif
-									</td>
-									<td>
 										@if($value->gender=="male")
 										Laki-Laki
 										@else
@@ -61,9 +52,6 @@
 										<i class="fa fa-phone"></i> {{ "62".$value->phone }}
 										<br>
 										<i class="fa fa-email"></i> {{ $value->email }}
-									</td>
-									<td>
-										@if(isset($value->jenis->name)){{ $value->jenis->name }} @endif
 									</td>
 									<td>
 										{{ StringHelper::dateindo($value->first_entry) }}

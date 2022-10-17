@@ -161,6 +161,7 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
+        Barryvdh\DomPDF\ServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -229,7 +230,8 @@ return [
         'StringHelper' => App\Helpers\StringHelper::class,
         'FileHelper' => App\Helpers\FileHelper::class,
         'ImageHelper' => App\Helpers\ImageHelper::class,
-        'GeneralHelper' => App\Helpers\GeneralHelper::class
+        'GeneralHelper' => App\Helpers\GeneralHelper::class,
+        'PDF' => Barryvdh\DomPDF\Facade::class,
     ],
 
 ];

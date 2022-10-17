@@ -423,8 +423,6 @@ public function changestatus(Request $request, $id)
             return redirect()->back()->with('error', 'Tanggal Awal dan Akhir tidak boleh lebih 31 hari ');
         }
 
-        $data["jenis"] = PatientStatus::select("name", "patient_status_id")->orderBy("name", "asc")->get();
-        $data["doctor"] = Doctors::getActive("referral");
         $data["data"] = $patients->get();
         $data["filter"] = array("format" => $format, 
             "end_date" => $end_date,
