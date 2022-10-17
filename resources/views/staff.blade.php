@@ -89,6 +89,7 @@
 												<i class="fa fa-pencil"></i> Ubah Status
 											</a>
 											@endif
+											
 											@if(StringHelper::getAccess("delete_permission")==true)
 											<a class="dropdown-item" href="#" onclick="CheckDelete('{{ url(Request::segment(1)) }}/{{ $value->staff_id }}')">
 												<i class="fa fa-times"></i> Hapus

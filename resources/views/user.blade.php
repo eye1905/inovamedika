@@ -71,7 +71,7 @@
 										@endif
 									</td>
 									<td width="200" class="text-center">
-										@if(Session("role_id") != "1" and $value->role->role_id !="1")
+										@if($value->role->code !="1")
 										<button class="btn btn-sm btn-info dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action</button>
 										<div class="dropdown-menu">
 											@if(StringHelper::getAccess("update_permission")==true)

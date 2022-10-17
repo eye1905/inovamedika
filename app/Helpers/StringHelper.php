@@ -15,10 +15,12 @@ class StringHelper
     {   
         $uri = request()->segment(1);
         $role_id = Session("role_id");
+        $role = Role::where("code", $role_id)->get()->first();
         $menus = Navigations::select("navigation_id")->where("uri", $uri)->get()->first();
         $inc_role = RolePermition::where("navigation_id", $menus->navigation_id)
-        ->where("role_id", $role_id)
+        ->where("role_id", $role->role_id)
         ->get()->first();
+        
         $url = "'".url($uri.'/'.$id)."'";
         
         $html = '<center>'; 
@@ -50,9 +52,10 @@ class StringHelper
     {   
         $uri = request()->segment(1);
         $role_id = Session("role_id");
+        $role = Role::where("code", $role_id)->get()->first();
         $menus = Navigations::select("navigation_id")->where("uri", $uri)->get()->first();
         $inc_role = RolePermition::where("navigation_id", $menus->navigation_id)
-        ->where("role_id", $role_id)
+        ->where("role_id", $role->role_id)
         ->get()->first();
         
         $url = "'".url($uri.'/'.$id)."'";
@@ -172,8 +175,9 @@ class StringHelper
             return true;
         }else{
             $menu  = Navigations::select("navigation_id")->where("uri", $uri)->get()->first();
+            $role = Role::where("code", Session("role_id"))->get()->first();
             $h_access = RolePermition::select($permit)->
-            where("role_id", Session("role_id"))->where("navigation_id", $menu->navigation_id)->get()->first()->toArray();
+            where("role_id", $role->role_id)->where("navigation_id", $menu->navigation_id)->get()->first()->toArray();
             
             return $h_access[$permit];
         }

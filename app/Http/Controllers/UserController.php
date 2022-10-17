@@ -283,6 +283,7 @@ class UserController extends Controller
             }
             
             $user->username             = $request->username;
+            $user->role_id             = $request->role_id;
             $user->updated_ip       = $request->ip();
             $user->status = $request->status;
             $user->updated_by       = Auth::user()->user_id;
