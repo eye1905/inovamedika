@@ -30,7 +30,7 @@ class Medicine extends Model
     public static function getJumlah()
     {
         $sql = "SELECT sum(s.qty) as jumlah,m.medicine_id,m.name FROM medicines m
-join medical_medicines s on m.medicine_id = s.medicine_id GROUP BY s.medicine_id";
+        join medical_medicines s on m.medicine_id = s.medicine_id GROUP BY s.medicine_id";
         
         $data = DB::select($sql);
 
@@ -56,4 +56,28 @@ join medical_medicines s on m.medicine_id = s.medicine_id GROUP BY s.medicine_id
         
         return $a_data;
     }
+
+    public static function getStatistik($start = null, $end = null)
+    {
+       $sql = "SELECT sum(s.qty) as jumlah,m.medicine_id,m.name FROM medicines m 
+       join medical_medicines s on m.medicine_id = s.medicine_id
+       join payments p on s.medical_id = p.medical_id
+       where p.date >='".$start."' and p.date <= '".$end."'  GROUP BY s.medicine_id";
+
+       $data = DB::select($sql);
+
+       return $data;
+   }
+
+   public static function getSumStatistik($start = null, $end = null)
+   {
+       $sql = "SELECT sum(s.price) as jumlah,m.medicine_id,m.name FROM medicines m 
+       join medical_medicines s on m.medicine_id = s.medicine_id
+       join payments p on s.medical_id = p.medical_id
+       where p.date >='".$start."' and p.date <= '".$end."'  GROUP BY s.medicine_id";
+
+       $data = DB::select($sql);
+       //dd($data);
+       return $data;
+   }
 }

@@ -1,94 +1,54 @@
 <script type="text/javascript">
-    var dslaki = [];
-    var dsperempuan = [];
-    var i = 0;
-    @foreach($kelaminpasien as $key => $value)
-    dslaki.push({{ $value["laki"] }});
-    dsperempuan.push({{ $value["perempuan"] }});
-    @endforeach
-
     (function($) {
         "use strict";
-
-// column chart
-var optionscolumnchart = {
-    series: [{
-      name: 'Laki - Laki',
-      data: dslaki
-  }, {
-      name: 'Perempuan',
-      data: dsperempuan,
-  }],
-
-  legend: {
-    show: false
-},
-chart: {
-  type: 'bar',
-  height: 380,
-},
-plotOptions: {
-    bar: {
-        radius: 10,
-        horizontal: false,
-        columnWidth: '55%',
-        endingShape: 'rounded',
-    }
-},
-dataLabels: {
-    enabled: false
-},
-stroke: {
-    show: true,
-    colors: ['transparent'],
-    curve: 'smooth',
-    lineCap: 'butt'
-},
-grid: {
-    show: false,
-    padding: {
-        left: 0,
-        right: 0
-    }
-},
-xaxis: {
-    title: {
-        text: 'Bulan'
+        var options = {
+          labels: [@foreach($obat as $key => $value) '{{ $value->name }}', @endforeach],
+          series: [@foreach($statsobat as $key => $value) '{{ $value->jumlah }}', @endforeach],
+          chart: {
+            type: 'donut',
+            height: 390 ,
+        },
+        legend:{
+            position:'bottom'
+        },
+        dataLabels: {
+            enabled: false,
+        },      
+        states: {          
+            hover: {
+              filter: {
+                type: 'darken',
+                value: 1,
+            }
+        }           
     },
-    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-},
-yaxis: {
-    title: {
-        text: 'Jumlah Pasien'
+    stroke: {
+        width: 0,
     },
-    categories: [10, 50, 100, 500, 1000]
-},
-fill: {
-    colors:[zetaAdminConfig.primary, zetaAdminConfig.warning],
-    type: 'gradient',
-    gradient: {
-        shade: 'light',
-        type: 'vertical',
-        shadeIntensity: 0.1,
-        inverseColors: false,
-        opacityFrom: 1,
-        opacityTo: 0.9,
-        stops: [0, 100]
-    }
-},
-tooltip: {
-    y: {
-        formatter: function (val) {
-            return  val 
+    responsive: [
+    {
+      breakpoint: 1661,
+      options: {
+        chart: {
+            height:310,
         }
     }
+},            
+{
+  breakpoint: 481,
+  options:{
+    chart:{
+        height:280,
+    }
+},
 }
+
+],     
+colors:[zetaAdminConfig.primary,zetaAdminConfig.secondary,zetaAdminConfig.success,zetaAdminConfig.info,zetaAdminConfig.warning,zetaAdminConfig.danger],
 };
-var chartcolumnchart = new ApexCharts(
-    document.querySelector("#chart-widget4"),
-    optionscolumnchart
-    );
-chartcolumnchart.render();
+var chart = new ApexCharts(document.querySelector("#chart-obat"), options);
+chart.render();
+
 
 var dsusia = [];
 
@@ -101,7 +61,6 @@ var optionscolumnchart = {
       name: 'Jumlah',
       data: dsusia
   }],
-
   legend: {
     show: false
 },
@@ -165,202 +124,8 @@ tooltip: {
     }
 }
 };
-var chartcolumnchart = new ApexCharts(
-    document.querySelector("#chart-widget8"),
-    optionscolumnchart
-    );
+var chartcolumnchart = new ApexCharts(document.querySelector("#chart-usia"),optionscolumnchart);
 chartcolumnchart.render();
-
-var twpaket = [];
-var twnamapaket = [];
-@foreach($paket as $key => $value)
-twpaket.push({{ $value->total }});
-twnamapaket.push('{{ $value->name }}');
-@endforeach
-
-var optionscolumnchart2 = {
-    series: [{
-      name: 'Jumlah',
-      data: twpaket
-  }],
-  legend: {
-    show: false
-},
-chart: {
-  type: 'bar',
-  height: 380
-},
-plotOptions: {
-    bar: {
-        radius: 10,
-        horizontal: false,
-        columnWidth: '55%',
-        endingShape: 'rounded',
-    }
-},
-dataLabels: {
-    enabled: false
-},
-stroke: {
-    show: true,
-    colors: ['transparent'],
-    curve: 'smooth',
-    lineCap: 'butt'
-},
-grid: {
-    show: false,
-    padding: {
-        left: 0,
-        right: 0
-    }
-},
-xaxis: {
-    title: {
-        text: 'Jenis Paket'
-    },
-    categories: twnamapaket,
-},
-yaxis: {
-    title: {
-        text: 'Jumlah Ambil Paket'
-    }
-},
-fill: {
-    colors: [function({ value, seriesIndex, w }) {
-        if (value <= 25) {
-          return '#77d8e7'
-        }else if(value >25 && value <= 50){
-            return '#77bae7'
-        }
-        else if(value >75 && value <= 100){
-            return '#dd9d45'
-        }
-        else {
-          return '#099c35'
-        }
-  }],
-  type: 'gradient',
-  gradient: {
-    shade: 'light',
-    type: 'vertical',
-    shadeIntensity: 0.1,
-    inverseColors: false,
-    opacityFrom: 1,
-    opacityTo: 0.9,
-    stops: [0, 100]
-}
-},
-tooltip: {
-    y: {
-        formatter: function (val) {
-            return  val 
-        }
-    }
-}
-};
-
-
-var chartcolumnchart1 = new ApexCharts(
-    document.querySelector("#chart-paket"),
-    optionscolumnchart2
-    );
-chartcolumnchart1.render();
-
-
-
-var twpaket = [];
-var twnamapaket = [];
-@foreach($fisio as $key => $value)
-twpaket.push({{ $value->total }});
-twnamapaket.push('{{ $value->name }}');
-@endforeach
-
-var optionscolumnchart2 = {
-    series: [{
-      name: 'Jumlah',
-      data: twpaket
-  }],
-  legend: {
-    show: false
-},
-chart: {
-  type: 'bar',
-  height: 380
-},
-plotOptions: {
-    bar: {
-        radius: 10,
-        horizontal: false,
-        columnWidth: '55%',
-        endingShape: 'rounded',
-    }
-},
-dataLabels: {
-    enabled: false
-},
-stroke: {
-    show: true,
-    colors: ['transparent'],
-    curve: 'smooth',
-    lineCap: 'butt'
-},
-grid: {
-    show: false,
-    padding: {
-        left: 0,
-        right: 0
-    }
-},
-xaxis: {
-    title: {
-        text: 'Fisioterapis'
-    },
-    categories: twnamapaket,
-},
-yaxis: {
-    title: {
-        text: 'Jumlah Penangan Terapi'
-    }
-},
-fill: {
-    colors: [function({ value, seriesIndex, w }) {
-        if (value <= 25) {
-          return '#6fa8dc'
-        }else if(value >25 && value <= 50){
-            return '#38761d'
-        }
-        else if(value >75 && value <= 100){
-            return '#f1c232'
-        }
-        else {
-          return '#f44336'
-        }
-  }],
-  type: 'gradient',
-  gradient: {
-    shade: 'light',
-    type: 'vertical',
-    shadeIntensity: 0.1,
-    inverseColors: false,
-    opacityFrom: 1,
-    opacityTo: 0.9,
-    stops: [0, 100]
-}
-},
-tooltip: {
-    y: {
-        formatter: function (val) {
-            return  val 
-        }
-    }
-}
-};
-var chartcolumnchart1 = new ApexCharts(
-    document.querySelector("#chart-fisioterapis"),
-    optionscolumnchart2
-    );
-chartcolumnchart1.render();
-
 
 })(jQuery);
 </script>

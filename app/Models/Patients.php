@@ -18,7 +18,7 @@ class Patients extends Model
     {
         return $this->belongsTo('App\Models\Regions', 'birthplace', 'id_wil');
     }
-    public static function countkelamin()
+    public static function countkelamin($start, $end)
     {
         $sql = "select COALESCE(l.laki,0) as laki, COALESCE(n.perempuan ,0) as perempuan, DATE_FORMAT(p.first_entry, '%m') as bulan from patients 
         p left join (
@@ -63,6 +63,7 @@ class Patients extends Model
         for ($i = 0; $i <12 ; $i++) {
             $umur[$i]= 0;
         }
+
         foreach($pasien as $key => $value){
             $usia = StringHelper::datedifferent(date("Y-m-d"), $value->birthdate);
             if($usia < 10){
@@ -85,8 +86,6 @@ class Patients extends Model
                 $umur[8] += $umur[8]+1;
             }elseif($usia >= 45 and $usia < 50){
                 $umur[9] += $umur[9]+1;
-            }elseif($usia >= 50){
-                $umur[10] += $umur[10]+1;
             }
         }
 

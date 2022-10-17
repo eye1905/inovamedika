@@ -9,6 +9,11 @@ use Session;
 use DB;
 use Exception;
 use App\Models\Role;
+use App\Models\Patients;
+use App\Models\MedicalTreatment;
+use App\Models\Staff;
+use App\Models\Payment;
+use App\Models\Medicine;
 
 class DashboardController extends Controller
 {
@@ -17,24 +22,38 @@ class DashboardController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $start_date = $request->start_date?$request->start_date:date('Y-01-01');
+        $end_date = $request->end_date?$request->end_date:date('Y-12-t');
 
-       $data["user"] = 0;
-       $data["pasien"] = 0;
-       $data["terapis"] = 0;
-       $data["jadwal"]  = [];
-       $data["kelaminpasien"] = [];
-       $data["usia"] = [];
-       $data["pengumuman"] = [];
-       $data["doctor"] = 0;
-       $data["diagnosa"] = [];
-       $data["intervensi"] = [];
-       $data["paket"] = [];
-       $data["fisio"] = [];
+        $data["user"] = Staff::where("entry_year", ">=", $start_date)->where("entry_year", "<=", $end_date)->count();
+        $data["pasien"] = Patients::where("first_entry", ">=", $start_date)->where("first_entry", "<=", $end_date)->count();
+        $data["medical"] = MedicalTreatment::where("date", ">=", $start_date)->where("date", "<=", $end_date)->count();
+        $data["payment"] = Payment::where("date", ">=", $start_date)->where("date", "<=", $end_date)->sum("nominal");
+        $data["obat"]  = Medicine::select("name", "medicine_id")->orderBy("name", "asc")->get();
+        $statsobat = Medicine::getStatistik($start_date, $end_date);
+        $sumobat = Medicine::getSumStatistik($start_date, $end_date);
 
-       return view("dashboard", $data);
-   }
+        $totalobat = 0;
+        foreach($statsobat as $key => $value){
+            $totalobat += $value->jumlah;
+        }
+        $sumtotalobat = 0;
+        foreach($sumobat as $key => $value){
+            $sumtotalobat += $value->jumlah;
+        }
+        $data["usia"] = Patients::getusia();
+        $data["statsobat"] = $statsobat;
+        $data["totalobat"] = $totalobat;
+        $data["sumobat"] = $sumobat;
+        $data["sumtotalobat"] = $sumtotalobat;
+        $data["filter"] = array(
+                            "start_date" => $start_date,
+                            "end_date" => $end_date);
+
+        return view("dashboard", $data);
+    }
 
     /**
      * Show the form for creating a new resource.
