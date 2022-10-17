@@ -9,6 +9,7 @@ use Session;
 use Exception;
 use Auth;
 use Validator;
+use PDF;
 
 class MedicineController extends Controller
 {
@@ -20,12 +21,21 @@ class MedicineController extends Controller
     public function index(Request $request)
     {
         $page = 10;
+        $f_medicine_id = null;
+
+        $medicine = Medicine::orderBy("name", "asc");
         if(isset($request->shareselect) and $request->shareselect != null){
             $page = $request->shareselect;
         }
 
-        $data["data"] = Medicine::paginate($page);
-        $data["filter"] = array("page" => $page);
+        if(isset($request->f_medicine_id) and $request->f_medicine_id != null){
+            $f_medicine_id = $request->f_medicine_id;
+            $medicine->where("medicine_id", $f_medicine_id);
+        }
+        
+        $data["data"] = $medicine->paginate($page);
+        $data["obat"] = Medicine::select("code", "medicine_id", "name")->orderBy("name", "asc")->get();
+        $data["filter"] = array("page" => $page, "f_medicine_id"=>$f_medicine_id);
         
         return view("medicines", $data);
     }
@@ -173,5 +183,49 @@ class MedicineController extends Controller
         }
         
         return redirect()->back()->with('success', 'Data obat dihapus');
+    }
+
+    public function reportmedicine(Request $request)
+    {
+        $f_medicine_id = null;
+        $medicine = Medicine::orderBy("name", "asc");
+        if(isset($request->f_medicine_id) and $request->f_medicine_id != null){
+            $f_medicine_id = $request->f_medicine_id;
+            $medicine->where("medicine_id", $f_medicine_id);
+        }
+        
+        $data["data"] = $medicine->get();
+        $data["jumlah"] = Medicine::getJumlah();
+        $data["nominal"] = Medicine::getNominal();
+        $data["obat"] = Medicine::select("code", "medicine_id", "name")->orderBy("name", "asc")->get();
+        $data["filter"] = array("f_medicine_id"=>$f_medicine_id);
+        
+        return view("report.medicine", $data);
+    }
+
+    public function cetakmedicine(Request $request)
+    {
+        $f_medicine_id = null;
+        $format = $request->format;
+
+        $medicine = Medicine::orderBy("name", "asc");
+        if(isset($request->f_medicine_id) and $request->f_medicine_id != null){
+            $f_medicine_id = $request->f_medicine_id;
+            $medicine->where("medicine_id", $f_medicine_id);
+        }
+        
+        $data["data"] = $medicine->get();
+        $data["jumlah"] = Medicine::getJumlah();
+        $data["nominal"] = Medicine::getNominal();
+        $data["obat"] = Medicine::select("code", "medicine_id", "name")->orderBy("name", "asc")->get();
+        
+        if($format == "pdf"){
+            $name = "Laporan".request()->segment(1).date("Y/m/d");
+            $pdf = PDF::loadview("print.medicine", $data)
+            ->setOptions(['defaultFont' => 'sans-serif'])->setPaper('folio', 'landscape');
+            return $pdf->stream();
+        }
+        
+        return view("print.medicine", $data);
     }
 }

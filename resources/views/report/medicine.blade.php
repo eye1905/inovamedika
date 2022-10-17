@@ -1,32 +1,32 @@
 @extends("template.layout")
-
 @section("content")
 <div class="card">
-    <div class="card-body">
-        @include("template.page-name")
-        @include("template.notif")
-        <form method="GET" action="{{ url()->current() }}" enctype="multipart/form-data" id="form-select">
-            @csrf
-            <input type="hidden" name="_method" value="GET">
-            @include("filter.filter-collapse")
-            <div class="row">
-                <div class="col-sm-12 col-lg-12 col-xl-12">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
+	<div class="card-body">
+		@include("template.page-name2")
+		@include("template.notif")
+		<form method="GET" action="{{ url()->current() }}" enctype="multipart/form-data" id="form-select">
+			@csrf
+			<input type="hidden" name="_method" value="GET">
+			@include("filter.filter-collapse")
+			<div class="row">
+				<div class="col-sm-12 col-lg-12 col-xl-12">
+					<div class="table-responsive">
+						<table class="table table-hover">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>Kode {{ StringHelper::getNameMenu() }}</th>
-                                    <th>Nama {{ StringHelper::getNameMenu() }}</th>
+                                    <th>Kode </th>
+                                    <th>Nama Obat</th>
                                     <th>Indikasi </th>
                                     <th>Dosis </th>
                                     <th>Harga </th>
-                                    <th>Aksi </th>
+                                    <th>Jumlah Terjual</th>
+                                    <th>Nominal Terjual</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @if(count($data) < 1)
                                 <tr>
-                                    <td colspan="6" class="text-center">Data Kosong</td>
+                                    <td colspan="7" class="text-center">Data Kosong</td>
                                 </tr>
                                 @endif
                                 @foreach($data as $key => $value)
@@ -44,36 +44,32 @@
                                     <td>
                                         {{ StringHelper::toRupiah($value->harga) }}
                                     </td>
-                                    <td class="text-center">
-                                        {!! StringHelper::inc_dropdown($value->medicine_id) !!}
+                                    <td>
+                                        @if(isset($jumlah[$value->medicine_id]))
+                                        {{$jumlah[$value->medicine_id]}}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if(isset($nominal[$value->medicine_id]))
+                                        {{ StringHelper::toRupiah($nominal[$value->medicine_id] )}}
+                                        @endif
                                     </td>
                                 </tr>
                                 @endforeach
                             </tbody>
                         </table>
-                    </div>
-                </div>
-                @include("template.paginate")
-            </div>
-        </form>
-    </div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
 </div>
 @endsection
-
 @section("script")
 <script src="{{ URL::asset('js/select2/select2.full.min.js') }}"></script>
 <script src="{{ URL::asset('js/select2/select2-custom.js') }}"></script>
 <script type="text/javascript">
-    $("#shareselect").change(function(){
-        $("#_method").attr("method", "GET");
-        $("#form-select").submit();
-    });
-
-    @if(isset($filter["page"]))
-    $("#shareselect").val('{{ $filter["page"] }}');
-    @endif
-
-    @if(isset($filter["f_medicine_id"]))
+	@if(isset($filter["f_medicine_id"]))
     $("#f_medicine_id").val('{{ $filter["f_medicine_id"] }}');
     @endif
 

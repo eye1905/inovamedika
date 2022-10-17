@@ -1,9 +1,9 @@
 <div class="col-md-4">
   <label class="col-form-label">
-    Nama Staff
+    Nama Pegawai
   </label>
   <select class="js-example-basic-single col-sm-12" id="fstaff_id" name="fstaff_id">
-    <option value="">-- Semua Staff --</option>
+    <option value="">-- Semua Pegawai --</option>
     @foreach($staff as $key => $value)
     <option value="{{ $value->staff_id }}">{{ StringHelper::ucsplit($value->name) }}</option>
     @endforeach

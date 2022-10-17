@@ -75,4 +75,7 @@ Route::group(['prefix' => '/', 'middleware' => ['auth', 'checkrole']], function(
 
     Route::get('/reportpayment', [PaymentController::class, 'reportpayment']);
     Route::get('/cetakpayment', [PaymentController::class, 'cetakpayment']);
+
+    Route::get('/reportmedicine', [MedicineController::class, 'reportmedicine']);
+    Route::get('/cetakmedicine', [MedicineController::class, 'cetakmedicine']);
 });
