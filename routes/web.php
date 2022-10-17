@@ -13,6 +13,7 @@ use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\CheckupController;
 use App\Http\Controllers\PatientsController;
 use App\Http\Controllers\MedicalTreatmentController;
+use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,4 +60,7 @@ Route::group(['prefix' => '/', 'middleware' => ['auth', 'checkrole']], function(
     Route::get('medical/{id}/deleteobat', [MedicalTreatmentController::class, 'deleteobat']);
     Route::post('medical/{id}/generate', [MedicalTreatmentController::class, 'generate']);
     Route::post('medical/{id}/payment', [MedicalTreatmentController::class, 'payment']);
+
+    Route::get('payment', [PaymentController::class, 'index']);
+    Route::get('payment/{id}', [PaymentController::class, 'show']);
 });
